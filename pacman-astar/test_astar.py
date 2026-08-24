@@ -5,6 +5,7 @@ Run with:  python test_astar.py
 """
 
 import unittest
+from pathlib import Path
 
 import config
 from astar import astar, manhattan_distance
