@@ -59,22 +59,23 @@ class TestWallAvoidance(unittest.TestCase):
 class TestUnreachableGoal(unittest.TestCase):
     """Test 3 - a fully blocked goal returns an empty path."""
 
-    def test_no_path(self):
+    def test_goal_behind_a_wall_is_unreachable(self):
+        # The right half is sealed off by a wall column.
         grid = Grid([
-            "P.#",
-            "..#",
-            "###",
-        ])
-        # (2, 0) and (2, 1) are walls; build an isolated goal instead.
-        grid2 = Grid([
             "P..#..",
             "...#..",
             "...#..",
             "...#..",
         ])
-        self.assertEqual(astar((0, 0), (4, 0), grid2), [])
-        self.assertEqual(astar((0, 0), (2, 0), grid), [(0, 0), (1, 0), (2, 0)]
-                         if not grid.is_wall((2, 0)) else [])
+        self.assertEqual(astar((0, 0), (4, 0), grid), [])
+
+    def test_goal_inside_a_wall(self):
+        grid = Grid([
+            "P.#",
+            "..#",
+            "...",
+        ])
+        self.assertEqual(astar((0, 0), (2, 0), grid), [])
 
 
 class TestGhostAvoidance(unittest.TestCase):
@@ -98,6 +99,22 @@ class TestGhostAvoidance(unittest.TestCase):
         self.assertGreater(ghosts.danger_cost(ghost_position), 0)
         far_cell = (1, 1)
         self.assertEqual(ghosts.danger_cost(far_cell), 0)
+
+    def test_danger_cost_changes_the_chosen_route(self):
+        # A ring corridor: the short way passes the ghost, the long way is safe.
+        grid = Grid([
+            "P....",
+            ".###.",
+            ".....",
+            ".###.",
+            ".....",
+        ])
+        ghosts = GhostManager([(2, 0)], grid)
+        short_path = astar((0, 0), (4, 0), grid)
+        safe_path = astar((0, 0), (4, 0), grid, extra_cost=ghosts.danger_cost)
+        self.assertIn((2, 0), short_path)          # shortest route hits the ghost
+        self.assertNotIn((2, 0), safe_path)        # danger cost reroutes it
+        self.assertGreater(len(safe_path), len(short_path))
 
     def test_pacman_never_steps_on_a_ghost(self):
         game = Game(seed=3)
