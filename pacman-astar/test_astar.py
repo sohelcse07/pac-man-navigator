@@ -15,27 +15,8 @@ from pacman import Game
 import demo
 
 
-class SimpleGrid(Grid):
-    """A tiny grid built from strings, used by the beginner tests."""
-
-
-def build(rows):
-    """Build a grid from rows, adding a Pac-Man start when missing."""
-    if not any("P" in row for row in rows):
-        rows = list(rows)
-        rows[0] = "P" + rows[0][1:]
-    return Grid(rows)
-
-
 class TestBasicAStar(unittest.TestCase):
     """Test 1 - basic 3x3 path finding."""
-
-    def test_3x3_path(self):
-        grid = build([
-            "S..",
-            "##.",
-            "..G",
-        ]).__class__ if False else None  # placeholder never used
 
     def test_3x3_start_to_goal(self):
         # S . .
