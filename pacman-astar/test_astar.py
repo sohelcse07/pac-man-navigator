@@ -100,6 +100,22 @@ class TestGhostAvoidance(unittest.TestCase):
         far_cell = (1, 1)
         self.assertEqual(ghosts.danger_cost(far_cell), 0)
 
+    def test_danger_cost_changes_the_chosen_route(self):
+        # A ring corridor: the short way passes the ghost, the long way is safe.
+        grid = Grid([
+            "P....",
+            ".###.",
+            ".....",
+            ".###.",
+            ".....",
+        ])
+        ghosts = GhostManager([(2, 0)], grid)
+        short_path = astar((0, 0), (4, 0), grid)
+        safe_path = astar((0, 0), (4, 0), grid, extra_cost=ghosts.danger_cost)
+        self.assertIn((2, 0), short_path)          # shortest route hits the ghost
+        self.assertNotIn((2, 0), safe_path)        # danger cost reroutes it
+        self.assertGreater(len(safe_path), len(short_path))
+
     def test_pacman_never_steps_on_a_ghost(self):
         game = Game(seed=3)
         for _ in range(400):
