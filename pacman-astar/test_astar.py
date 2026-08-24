@@ -124,7 +124,9 @@ class TestNoKeyboardInput(unittest.TestCase):
     """Test 6 - the game runs with no user input whatsoever."""
 
     def test_no_input_api_used(self):
-        source = open("pacman.py").read() + open("demo.py").read()
+        here = Path(__file__).parent
+        source = ((here / "pacman.py").read_text()
+                  + (here / "demo.py").read_text())
         for forbidden in ("input(", "K_UP", "K_LEFT", "K_w", "get_pressed"):
             self.assertNotIn(forbidden, source)
 
